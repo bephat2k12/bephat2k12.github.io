@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>TPMODZ - UI WEBSITE</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+
+  <style>
+    /* ==== DYNAMIC THEME VARIABLES ==== */
+    :root {
+      --primary-rgb: 255, 0, 60;
+      --primary-color: #ff003c;
+      --dark-color: #8b0015;
+      --bg-color: #050507;
+      --surface-bg: rgba(15, 15, 18, 0.65);
+      --text-main: #ffffff;
+      --text-sec: #a0a0b0;
+      --success: #00ff66;
+    }
+
+    [data-theme="blue"] {
+      --primary-rgb: 0, 212, 255;
+      --primary-color: #00d4ff;
+      --dark-color: #005a7a;
+    }
+
+    [data-theme="purple"] {
+      --primary-rgb: 176, 38, 255;
+      --primary-color: #b026ff;
+      --dark-color: #480075;
+    }
+
+    [data-theme="green"] {
+      --primary-rgb: 0, 255, 102;
+      --primary-color: #00ff66;
+      --dark-color: #006629;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease, color 0.4s ease;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      padding-bottom: 120px;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* ==== CYBERPUNK SCANLINES (NEW) ==== */
+    body::after {
+      content: "";
+      position: fixed; inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 9999;
+      pointer-events: none;
+      opacity: 0.4;
+    }
+
+    /* ==== PREMIUM BACKGROUND GRID & GLOW ==== */
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      background: 
+        linear-gradient(rgba(var(--primary-rgb), 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(var(--primary-rgb), 0.05) 1px, transparent 1px);
+      background-size: 40px 40px;
+      z-index: -2;
+    }
+
+    .ambient-glow {
+      position: fixed;
+      top: 20%; left: 50%;
+      width: 70vw; height: 70vw;
+      background: radial-gradient(circle, rgba(var(--primary-rgb), 0.15) 0%, transparent 60%);
+      transform: translate(-50%, -50%);
+      z-index: -1;
+      border-radius: 50%;
+      filter: blur(80px);
+      animation: pulse-glow 8s infinite alternate ease-in-out;
+    }
+
+    /* ==== FLOATING PARTICLES SYSTEM (NEW) ==== */
+    #particles-container {
+      position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none;
+    }
+    .particle {
+      position: absolute;
+      background: radial-gradient(circle, rgba(var(--primary-rgb), 0.6) 0%, transparent 70%);
+      border-radius: 50%;
+      animation: floatUp linear infinite;
+      opacity: 0;
+    }
+
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      20% { opacity: 0.8; transform: translateY(80vh) scale(1); }
+      80% { opacity: 0.5; transform: translateY(20vh) scale(1.2); }
+      100% { transform: translateY(-10vh) scale(0.5); opacity: 0; }
+    }
+
+    @keyframes pulse-glow {
+      0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.5; }
+      100% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    }
+
+    /* ==== ENTRY ANIMATIONS (NEW) ==== */
+    .fade-in-up {
+      animation: slideUpFade 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      opacity: 0; transform: translateY(30px);
+    }
+    @keyframes slideUpFade { to { opacity: 1; transform: translateY(0); } }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.3s; }
+    .delay-3 { animation-delay: 0.5s; }
+
+    /* ==== GLASSMORPHISM PANELS ==== */
+    .glass-panel {
+      background: var(--surface-bg);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(var(--primary-rgb), 0.15);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.4s, box-shadow 0.4s;
+    }
+    .glass-panel:hover {
+      border-color: rgba(var(--primary-rgb), 0.5);
+      box-shadow: 0 10px 40px rgba(var(--primary-rgb), 0.2);
+      transform: translateY(-4px);
+    }
+
+    /* ==== FLOATING BUTTONS (THEME & ADMIN) ==== */
+    .top-controls {
+      position: fixed; top: 20px; right: 20px;
+      display: flex; gap: 12px; z-index: 100;
+    }
+
+    .floating-btn {
+      width: 45px; height: 45px;
+      border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      font-size: 20px; cursor: pointer; color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      background: rgba(var(--primary-rgb), 0.1);
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.1);
+    }
+    .floating-btn:hover {
+      background: var(--primary-color); color: #fff;
+      box-shadow: 0 0 20px var(--primary-color); transform: scale(1.05);
+    }
+
+    /* ==== HEADER / PROFILE ==== */
+    .profile-header {
+      padding: 80px 20px 40px; text-align: center; max-width: 600px; margin: 0 auto;
+    }
+
+    .avatar-wrapper {
+      position: relative; width: 140px; height: 140px; margin: 0 auto 20px;
+      border-radius: 50%; padding: 4px;
+      background: linear-gradient(135deg, var(--primary-color), var(--dark-color), var(--primary-color));
+      animation: spin-border 4s linear infinite;
+      box-shadow: 0 0 30px rgba(var(--primary-rgb), 0.4);
+    }
+    
+    @keyframes spin-border { 100% { transform: rotate(360deg); } }
+
+    .avatar {
+      width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+      border: 4px solid var(--bg-color); animation: counter-spin 4s linear infinite;
+    }
+    @keyframes counter-spin { 100% { transform: rotate(-360deg); } }
+
+    .title {
+      font-size: 34px; font-weight: 800; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center; gap: 10px; letter-spacing: 1px;
+    }
+    .verify { width: 26px; height: 26px; filter: drop-shadow(0 0 5px var(--primary-color)); }
+
+    .typed-text {
+      font-family: 'Space Mono', monospace; font-size: 15px; color: var(--primary-color);
+      font-weight: 700; min-height: 24px; text-transform: uppercase;
+      letter-spacing: 2px; text-shadow: 0 0 10px rgba(var(--primary-rgb), 0.5);
+    }
+
+    /* ==== SOCIAL & QUICK ACTIONS ==== */
+    .action-grid { display: flex; justify-content: center; gap: 12px; margin-top: 30px; flex-wrap: wrap; }
+    .action-btn {
+      display: flex; align-items: center; gap: 8px; padding: 12px 24px;
+      border-radius: 12px; font-weight: 600; font-size: 14px; color: white;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+    }
+    .btn-donate:hover { background: #ff416c; border-color: #ff416c; box-shadow: 0 0 15px rgba(255, 65, 108, 0.5); transform: translateY(-3px); }
+    .btn-telegram:hover { background: #0088cc; border-color: #0088cc; box-shadow: 0 0 15px rgba(0, 136, 204, 0.5); transform: translateY(-3px); }
+    .btn-zalo:hover { background: #0180c7; border-color: #0180c7; box-shadow: 0 0 15px rgba(1, 128, 199, 0.5); transform: translateY(-3px); }
+
+    /* ==== MAIN CONTENT SECTIONS ==== */
+    .container { max-width: 600px; margin: 0 auto; padding: 0 20px; }
+
+    .section-title {
+      font-size: 14px; font-weight: 800; margin: 35px 0 15px;
+      text-transform: uppercase; letter-spacing: 3px; color: var(--text-sec);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after {
+      content: ""; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,255,255,0.1), transparent);
+    }
+
+    /* ==== APP LIST ITEMS ==== */
+    .app-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px; margin-bottom: 16px;
+    }
+    .app-info { display: flex; align-items: center; gap: 16px; }
+    .app-icon {
+      width: 56px; height: 56px; border-radius: 14px; object-fit: cover;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.05);
+    }
+    .app-name { font-size: 17px; font-weight: 700; color: white; letter-spacing: 0.5px; }
+    .app-desc { font-size: 13px; color: var(--text-sec); margin-top: 4px; font-family: 'Space Mono', monospace; }
+
+    .download-btn {
+      width: 45px; height: 45px; border-radius: 12px;
+      background: rgba(var(--primary-rgb), 0.1); color: var(--primary-color);
+      border: 1px solid rgba(var(--primary-rgb), 0.3);
+      display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;
+    }
+    .download-btn:hover {
+      background: var(--primary-color); color: white;
+      box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.5); transform: scale(1.1);
+    }
+
+    .admin-action {
+      background: rgba(0, 255, 102, 0.1); color: var(--success);
+      border-color: rgba(0, 255, 102, 0.3); margin-left: 10px; display: none;
+    }
+    .admin-action.show { display: flex; }
+    .admin-action:hover {
+      background: var(--success); color: black; box-shadow: 0 0 20px rgba(0, 255, 102, 0.5);
+    }
+
+    /* ==== MODERN SEGMENTED TABS ==== */
+    .tab-container {
+      display: flex; background: rgba(0,0,0,0.6); border-radius: 12px; padding: 6px; margin-bottom: 24px;
+      position: relative; border: 1px solid rgba(255,255,255,0.05);
+    }
+    .tab-btn {
+      flex: 1; text-align: center; padding: 12px 0; font-size: 14px; font-weight: 700; color: var(--text-sec);
+      cursor: pointer; z-index: 2; text-transform: uppercase; letter-spacing: 1px;
+    }
+    .tab-btn.active { color: white; }
+    
+    .tab-indicator {
+      position: absolute; top: 6px; bottom: 6px; left: 6px; width: calc(50% - 6px);
+      background: var(--primary-color); border-radius: 8px; z-index: 1;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4);
+    }
+    
+    .tab-content { display: none; animation: fadeIn 0.5s ease forwards; }
+    .tab-content.active { display: block; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ==== FLOATING CYBER MUSIC PLAYER ==== */
+    .music-widget {
+      position: fixed; bottom: 24px; right: 24px; left: 24px; max-width: 450px; margin: 0 auto; z-index: 999;
+      background: rgba(10, 10, 12, 0.85); backdrop-filter: blur(20px);
+      border: 1px solid rgba(var(--primary-rgb), 0.2); border-radius: 20px; padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 20px rgba(var(--primary-rgb), 0.15);
+    }
+
+    .track-info { display: flex; align-items: center; gap: 16px; }
+    .disk {
+      width: 46px; height: 46px; border-radius: 50%; background: linear-gradient(135deg, #222, #050505);
+      border: 2px solid var(--primary-color); display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.3);
+    }
+    .disk.spin { animation: spin 4s linear infinite; }
+    .disk::after { content: ''; width: 12px; height: 12px; background: #000; border-radius: 50%; border: 1px solid #333;}
+    
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+
+    .track-name { font-size: 15px; font-weight: 700; color: white; letter-spacing: 0.5px; }
+    .track-artist { font-size: 12px; color: var(--text-sec); margin-top: 2px; }
+
+    /* Visualizer */
+    .visualizer { display: flex; gap: 4px; align-items: flex-end; height: 16px; margin-top: 6px; }
+    .bar { width: 4px; background: var(--primary-color); border-radius: 4px; height: 20%; transition: height 0.1s ease; }
+    .visualizer.active .bar { animation: bounce 0.5s infinite alternate; box-shadow: 0 0 8px var(--primary-color); }
+    .visualizer.active .bar:nth-child(2) { animation-delay: 0.1s; }
+    .visualizer.active .bar:nth-child(3) { animation-delay: 0.2s; }
+    .visualizer.active .bar:nth-child(4) { animation-delay: 0.3s; }
+    
+    @keyframes bounce { to { height: 100%; } }
+
+    .player-controls { display: flex; gap: 18px; align-items: center; }
+    .ctrl-btn { background: none; border: none; color: white; font-size: 22px; cursor: pointer; transition: 0.2s; }
+    .ctrl-btn:hover { color: var(--primary-color); transform: scale(1.15); }
+    .play-btn { font-size: 38px; color: var(--primary-color); text-shadow: 0 0 15px rgba(var(--primary-rgb), 0.5); }
+
+    /* ==== ADMIN LOGIN MODAL ==== */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px);
+      display: none; align-items: center; justify-content: center; z-index: 10000; opacity: 0; transition: opacity 0.3s;
+    }
+    .modal-overlay.show { display: flex; opacity: 1; }
+
+    .modal-box {
+      background: rgba(15,15,18,0.9); border: 1px solid var(--primary-color);
+      border-radius: 20px; width: 90%; max-width: 360px; padding: 30px; text-align: center;
+      box-shadow: 0 0 40px rgba(var(--primary-rgb), 0.2);
+      transform: translateY(20px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .modal-overlay.show .modal-box { transform: translateY(0); }
+
+    .modal-box h2 { color: white; margin-bottom: 8px; font-size: 24px; font-weight: 800; }
+    .modal-box p { color: var(--text-sec); font-size: 14px; margin-bottom: 25px; }
+    
+    .modal-input {
+      width: 100%; padding: 14px; margin-bottom: 16px; background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: white; outline: none; transition: 0.3s; font-family: 'Space Mono', monospace; font-size: 14px;
+    }
+    .modal-input:focus { border-color: var(--primary-color); box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.2); }
+
+    .modal-btns { display: flex; gap: 12px; }
+    .m-btn {
+      flex: 1; padding: 14px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; color: white;
+      text-transform: uppercase; font-size: 13px; letter-spacing: 1px;
+    }
+    .m-close { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+    .m-login { background: var(--primary-color); box-shadow: 0 0 15px rgba(var(--primary-rgb), 0.4); }
+    .m-close:hover { background: rgba(255,255,255,0.1); }
+    .m-login:hover { background: var(--dark-color); box-shadow: 0 0 25px rgba(var(--primary-rgb), 0.6); }
+
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+  <div id="particles-container"></div>
+
+  <audio id="bgMusic" src="https://files.catbox.moe/cre1ul.mp3"></audio>
+
+  <div class="top-controls fade-in-up delay-1">
+    <div class="floating-btn glass-panel" onclick="cycleTheme()" title="Change Theme">
+      <i class="bi bi-palette-fill"></i>
+    </div>
+    <div class="floating-btn glass-panel admin-btn" onclick="openAdmin()" title="Admin Access">
+      <i class="bi bi-shield-lock-fill"></i>
+    </div>
+  </div>
+
+  <header class="profile-header fade-in-up delay-1">
+    <div class="avatar-wrapper">
+      <img class="avatar" src="images/mt.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" alt="Avatar">
+    </div>
+    <h1 class="title">TPMODZ <img class="verify" src="images/McqzSg1.png" onerror="this.src='https://cdn-icons-png.flaticon.com/512/7641/7641727.png'" alt="verified"></h1>
+    <div class="typed-text"><span id="typedElement"></span></div>
+
+    <div class="action-grid">
+      <a href="/donate.html" class="action-btn btn-donate">
+        <i class="bi bi-suit-heart-fill"></i> Donate
+      </a>
+      <a href="https://t.me/tphazzz" class="action-btn btn-telegram">
+        <i class="bi bi-telegram"></i> Telegram
+      </a>
+      <a href="https://zalo.me/+84333858442" class="action-btn btn-zalo">
+        <i class="bi bi-chat-dots-fill"></i> Zalo
+      </a>
+    </div>
+  </header>
+
+  <div class="container fade-in-up delay-2">
+    
+    <div class="section-title">phần chính</div>
+    <div class="app-item glass-panel">
+      <div class="app-info">
+        <img src="images/image_20260201838ab24ce6c82155d5881c796ceede1a.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/5969/5969020.png'" class="app-icon">
+        <div>
+          <div class="app-name">zachiver</div>
+          <div class="app-desc">MT manager</div>
+        </div>
+      </div>
+      <div style="display:flex;">
+        <a href="https://is.gd/FOq0vm" class="download-btn"><i class="bi bi-cloud-arrow-down-fill"></i></a>
+        <a href="https://is.gd/FOq0vm" class="download-btn admin-action"><i class="bi bi-star-fill"></i></a>
+      </div>
+    </div>
+
+    <div class="app-item glass-panel">
+      <div class="app-info">
+        <img src="images/image_20260123bfd686d50a247ea3b2615b481edf2a24.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/2912/2912760.png'" class="app-icon">
+        <div>
+          <div class="app-name">apk</div>
+          <div class="app-desc">Download ZIP</div>
+        </div>
+      </div>
+      <a href="https://khoindvn.io.vn/document/DNS/ESignCert.zip" class="fa-solid fa-fingerprint"><i class="bi bi-cloud-arrow-down-fill"></i></a>
+    </div>
+
+    <div class="section-title">phần mềm fix lỗi</div>
+    
+    <div class="tab-container">
+      <div class="tab-indicator" id="tabIndicator"></div>
+      <div class="tab-btn active" onclick="switchTab('esignTab', 0, this)">1.1.1.1</div>
+      <div class="tab-btn" onclick="switchTab('ksignTab', 1, this)">kiwi vpn</div>
+    </div>
+
+    <div id="esignTab" class="tab-content active">
+      <div class="app-item glass-panel">
+        <div class="app-info">
+          <img src="images/image_202511239c3c89b67d68c9108f626d76aab44cd5.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/732/732244.png'" class="app-icon">
+          <div>
+            <div class="app-name">website admin</div>
+            <div class="app-desc">demo by </div>
+          </div>
+        </div>
+        <a href="https://pn229337-byte.github.io/" class="fa-solid fa-fingerprint"><i class="fa-solid fa-fingerprint"></i></a>
+      </div>
+      
+      <div class="app-item glass-panel">
+        <div class="app-info">
+          <img src="images/image_202511239c3c89b67d68c9108f626d76aab44cd5.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/732/732244.png'" class="app-icon">
+          <div>
+            <div class="app-name">pace của adm</div>
+            <div class="app-desc">FB á nha :></div>
+          </div>
+        </div>
+        <a href="" class="fa-solid fa-fingerprint"><i class="fa-solid fa-fingerprint"></i></a>
+      </div>
+    </div>
+
+    <div id="ksignTab" class="tab-content">
+      <div class="app-item glass-panel">
+        <div class="app-info">
+          <img src="images/image_20251123de304b11effa975dbb99a1e162dde6a7.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6124/6124997.png'" class="app-icon">
+          <div>
+            <div class="app-name">TIK TOK ADM</div>
+            <div class="app-desc">nhớ fl add</div>
+          </div>
+        </div>
+        <a href="https://tiktok.com/@ntp.555" class="fa-solid fa-fingerprint"><i class="fa-solid fa-fingerprint"></i></a>
+      </div>
+      
+      <div class="app-item glass-panel">
+        <div class="app-info">
+          <img src="images/image_20251123de304b11effa975dbb99a1e162dde6a7.jpg" onerror="this.src='https://cdn-icons-png.flaticon.com/512/6124/6124997.png'" class="app-icon">
+          <div>
+            <div class="app-name">discodr</div>
+            <div class="app-desc">không mấy khi hoạt động</div>
+          </div>
+        </div>
+        <a href="https://discodr/@tpmodz" class="fa-solid fa-fingerprint"><i class="fa-solid fa-fingerprint"></i></a>
+      </div>
+    </div>
+
+  </div> 
+
+  <div class="music-widget fade-in-up delay-3">
+    <div class="track-info">
+      <div class="disk" id="musicDisk"></div>
+      <div>
+        <div class="track-name" id="songTitle">Mưa Đợi Chờ Remix</div>
+        <div class="track-artist">TPMODZ X MIXI</div>
+        <div class="visualizer" id="audioBars">
+          <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+        </div>
+      </div>
+    </div>
+    <div class="player-controls">
+      <button class="ctrl-btn" onclick="prevSong()"><i class="bi bi-skip-backward-fill"></i></button>
+      <button class="ctrl-btn play-btn" onclick="togglePlay()"><i class="bi bi-play-circle-fill" id="playBtnIcon"></i></button>
+      <button class="ctrl-btn" onclick="nextSong()"><i class="bi bi-skip-forward-fill"></i></button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="adminModal">
+    <div class="modal-box">
+      <h2><i class="bi bi-incognito" style="color:var(--primary-color)"></i> Root Access</h2>
+      <p>Enter the master code to unlock hidden panels.</p>
+      <input type="text" id="user" class="modal-input" placeholder="Username" autocomplete="off">
+      <input type="password" id="pass" class="modal-input" placeholder="Password">
+      <div class="modal-btns">
+        <button class="m-btn m-close" onclick="closeAdmin()">Cancel</button>
+        <button class="m-btn m-login" onclick="doLogin()">Authenticate</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==== 0. Particle Generator ====
+    function createParticles() {
+      const container = document.getElementById('particles-container');
+      const particleCount = 25; // Number of floating orbs
+      
+      for(let i = 0; i < particleCount; i++) {
+        let p = document.createElement('div');
+        p.classList.add('particle');
+        
+        let size = Math.random() * 80 + 20; // 20px to 100px
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left = Math.random() * 100 + 'vw';
+        p.style.animationDuration = (Math.random() * 10 + 8) + 's'; // 8s to 18s
+        p.style.animationDelay = (Math.random() * 5) + 's';
+        
+        container.appendChild(p);
+      }
+    }
+    createParticles();
+
+    // ==== 1. Theme System Engine ====
+    const themes = ['red', 'blue', 'purple', 'green'];
+    let currentThemeIndex = 0;
+
+    function initTheme() {
+      const savedTheme = localStorage.getItem('user_theme') || 'red';
+      currentThemeIndex = themes.indexOf(savedTheme);
+      if (currentThemeIndex === -1) currentThemeIndex = 0;
+      document.documentElement.setAttribute('data-theme', themes[currentThemeIndex]);
+    }
+
+    function cycleTheme() {
+      currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+      const newTheme = themes[currentThemeIndex];
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('user_theme', newTheme);
+    }
+    
+    initTheme();
+
+    // ==== 2. Typed.js Initialization ====
+    document.addEventListener("DOMContentLoaded", function() {
+      if(typeof Typed !== 'undefined') {
+        new Typed('#typedElement', {
+          strings: ['lập trình bởi TPMODZ', 'amdtpmodz moder ', 'chào mừng đến với TPMODZ - đark - ui'],
+          typeSpeed: 50,
+          backSpeed: 30,
+          loop: true,
+          showCursor: true,
+          cursorChar: '_'
+        });
+      }
+      if(localStorage.getItem('isAdmin_cyber') === 'true') {
+        enableAdminUI();
+      }
+    });
+
+    // ==== 3. Animated Tab Switcher ====
+    function switchTab(tabId, index, btnElement) {
+      const indicator = document.getElementById('tabIndicator');
+      indicator.style.transform = `translateX(${index * 100}%)`;
+      
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    // ==== 4. Cyber Music Player ====
+    const audio = document.getElementById('bgMusic');
+    const playIcon = document.getElementById('playBtnIcon');
+    const titleText = document.getElementById('songTitle');
+    const visualizer = document.getElementById('audioBars');
+    const disk = document.getElementById('musicDisk');
+
+    const playlist = [
+      { name: "cứ vội vàng remix", url: "https://files.catbox.moe/d9fj4k.mp3" },
+      { name: "em ơi lên phố", url: "https://files.catbox.moe/7vsv3c.mp3" },
+      { name: "nợ một lời thương", url: "https://files.catbox.moe/7j26nt.mp3" }
+    ];
+    let currentSong = 0;
+
+    function loadSong(index) {
+      audio.src = playlist[index].url;
+      titleText.innerText = playlist[index].name;
+      audio.play();
+      updatePlayerUI(true);
+    }
+
+    function togglePlay() {
+      if (audio.paused) {
+        audio.play();
+        updatePlayerUI(true);
+      } else {
+        audio.pause();
+        updatePlayerUI(false);
+      }
+    }
+
+    function nextSong() {
+      currentSong = (currentSong + 1) % playlist.length;
+      loadSong(currentSong);
+    }
+
+    function prevSong() {
+      currentSong = (currentSong - 1 + playlist.length) % playlist.length;
+      loadSong(currentSong);
+    }
+
+    function updatePlayerUI(isPlaying) {
+      if(isPlaying) {
+        playIcon.className = "bi bi-pause-circle-fill";
+        visualizer.classList.add('active');
+        disk.classList.add('spin');
+      } else {
+        playIcon.className = "bi bi-play-circle-fill";
+        visualizer.classList.remove('active');
+        disk.classList.remove('spin');
+      }
+    }
+
+    audio.onended = () => nextSong();
+
+    // ==== 5. Admin Login System ====
+    const modal = document.getElementById('adminModal');
+    
+    function openAdmin() {
+      if(localStorage.getItem('isAdmin_cyber') === 'true') {
+        if(confirm("Secure Logout?")) {
+          localStorage.removeItem('isAdmin_cyber');
+          location.reload();
+        }
+        return;
+      }
+      modal.classList.add('show');
+    }
+
+    function closeAdmin() {
+      modal.classList.remove('show');
+    }
+
+    function enableAdminUI() {
+      document.querySelectorAll('.admin-action').forEach(el => el.classList.add('show'));
+      const btn = document.querySelector('.admin-btn');
+      btn.style.borderColor = 'var(--success)';
+      btn.style.color = 'var(--success)';
+      btn.style.boxShadow = '0 0 15px rgba(0,255,102,0.4)';
+    }
+
+    function doLogin() {
+      const u = document.getElementById('user').value;
+      const p = document.getElementById('pass').value;
+      if(u === 'ddatios' && p === '123') {
+        localStorage.setItem('isAdmin_cyber', 'true');
+        closeAdmin();
+        enableAdminUI();
+      } else {
+        alert("Access Denied: Invalid Credentials");
+      }
+    }
+  </script>
+</body>
+</html>
